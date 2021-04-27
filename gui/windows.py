@@ -58,7 +58,7 @@ class AppWindow(Gtk.Application, Log):
         window.set_titlebar(self.make_headerbar())
         window.connect("delete_event", self.on_delete_event)
         self.widgets["btn_stop"].set_sensitive(False)
-        # dimensionnement de la fenêtre et de la zone de dessin
+        # Dimensionnement de la fenêtre et de la zone de dessin
         self._redimensionner()
         window.set_resizable(False)
         window.show_all()
@@ -70,7 +70,9 @@ class AppWindow(Gtk.Application, Log):
         Gtk.Application.do_startup(self)
 
     def on_delete_event(self, gtk_widget, event):
+
         """ Arrêt de l'application """
+
         self.on_sim_stop(None)
         Gtk.Application.quit(self)
 
@@ -80,35 +82,46 @@ class AppWindow(Gtk.Application, Log):
         @type  gtk_widget: Button
         @param gtk_widget: Composant lié à l'événement
         """
-        self.logger.debug("Démarrage d'une simulation...")
-        # activation du bouton stop et désactivation du bouton start
+        self.logger.debug("Demarrage d'une simulation...")
+
+        # Activation du bouton stop et désactivation du bouton start
+
         self.widgets["btn_start"].set_sensitive(False)
         self.widgets["btn_stop"].set_sensitive(True)
-        # initialisation
+
+        # Initialisation
+
         self.batiment = Batiment(self.widgets["area"], self.params)
-        # on démarre le rafraîchissement régulier du dessin,
-        # mais on peut l'optimiser en ne l'activant que durant une animation
+
+        # On démarre le rafraîchissement régulier du dessin
+
         self._timer = GObject.timeout_add(200, self.__area_refresh_timeout)
-        self.logger.debug("Démarrage de la simulation (%s)." % self.params)
+        self.logger.debug("Demarrage de la simulation (%s)." % self.params)
 
     def _redimensionner(self):
         """
         Détermine la dimension de la fenêtre et de la zone de dessin.
         """
-        # suppression de la zone de dessin si elle existe pour la créer
-        # avec les dimensions voulues
+        # Suppression de la zone de dessin si elle existe pour la créer avec les dimensions voulues
+
         window = self.widgets["window"]
+
         try:
             area = self.widgets["area"]
             window.remove(area)
+
         except:
-            # self.logger.debug("Pas de zone de dessin à remplacer.")
+
             pass
-        # construction du nouveau composant graphique
+
+        # Construction du nouveau composant graphique
+
         area = Gtk.DrawingArea()
         self.widgets["area"] = area
         window.add(area)
-        # définition des dimensions requises
+
+        # Définition des dimensions requises
+
         larg = 1800
         ht = 1000
         window.set_default_size(larg, ht)
@@ -123,38 +136,43 @@ class AppWindow(Gtk.Application, Log):
         @type  gtk_widget: Gtk.Button
         @param gtk_widget: Composant lié à l'événement
         """
-        # arrêt des ascenseurs et du simulateur d'appels
+        # Arrêt des ascenseurs et du simulateur d'appels
+
         if self.batiment:
             for asc in self.batiment.automate.ascenseurs:
                 asc.on_simu_stop()
                 self.batiment.sim_appels.flg_stop = True
             self.batiment = None
+
         if gtk_widget:
-            # s'il ne s'agit pas d'un arrêt forcé suite à la modification
-            # des options sans avoir lancé de simulation
+
+            # S'il ne s'agit pas d'un arrêt forcé suite à la modification des options sans avoir lancé de simulation
             GObject.source_remove(self._timer)
             self._timer = None
-            # on s'assure d'un dernier rafraichissement pour effacer le dessin
+
+            # On s'assure d'un dernier rafraichissement pour effacer le dessin
+
             self.__area_refresh_timeout()
-        # déactivation du bouton stop et sactivation du bouton start
+
+        # Désactivation du bouton stop et sactivation du bouton start
+
         self.widgets["btn_stop"].set_sensitive(False)
         self.widgets["btn_start"].set_sensitive(True)
-        self.logger.debug("Arrêt de la simulation.")
+        self.logger.debug("Arret de la simulation.")
 
 
     def on_draw(self, area, context):
         """
         Actualisation du dessin demandée par Gtk.
-        @type  area: DrawingArea
-        @param area: Composant lié à l'événement
-        @type  context: cairo context
-        @param context: Surface de dessin
+
         """
-        # arrière-plan
+        # Arrière-plan
+
         color = Gdk.RGBA()
         color.parse("#000")
         area.override_background_color(0, color)
-        # dessin du bâtiment (qui dessinera le reste)
+
+        # Dessin du bâtiment
         if self.batiment:
             self.batiment.dessiner(area, context)
 
@@ -164,7 +182,9 @@ class AppWindow(Gtk.Application, Log):
         Demande un refraîchissement du dessin.
         """
         self.widgets["area"].queue_draw()
-        # réactive le timer
+
+        # Réactiver le timer
+
         return True
 
     def make_headerbar(self):
@@ -173,7 +193,7 @@ class AppWindow(Gtk.Application, Log):
 
         hb = Gtk.HeaderBar()
         hb.set_show_close_button(True)
-        hb.props.title = "Pavillon de l'humanité"
+        hb.props.title = "Pavillon de l'humanite"
 
         # Bouton démarrer
 
@@ -211,8 +231,8 @@ class AppWindow(Gtk.Application, Log):
         box.add(btn_options)
         hb.pack_start(box)
 
-
         return hb
+
 
     def configuration(self, gtk_widget):
 
