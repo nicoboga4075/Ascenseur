@@ -77,12 +77,14 @@ class AscenseurGui:
     """
     Dessin d'un ascenseur.
     """
-    # position de l'ascenseur
+    # Position de l'ascenseur
+
     POS_X_GAUCHE = None
     POS_X_DROITE = None
     pos_y = None
-    # valeur de l'écartement d'un battant, laissant 1 de côté lorsqu'il est
-    # ouvert en grand. Un battant fait 20 de large.
+
+    # Valeur de l'écartement d'un battant, laissant 1 de côté lorsqu'il est ouvert en grand. Un battant fait 20 de large.
+
     largeur_battant = None
     LRG_BATTANT_MAX = 20.0
     OUV_INCREMENT = 3
@@ -90,7 +92,9 @@ class AscenseurGui:
     FERMER_PORTE = 2
 
     ascenseur = None
-    # demande d'arrêt d'un thread si actif
+
+    # Demande d'arrêt d'un thread si actif
+
     flg_simu_stop = None
 
     def __init__(self, ascenseur, etage = 0):
@@ -101,9 +105,13 @@ class AscenseurGui:
         @param etage: étage de départ de l'ascenseur
         """
         self.ascenseur = ascenseur
-        # portes fermées par défaut
+
+        # Portes fermées par défaut
+
         self.largeur_battant = self.LRG_BATTANT_MAX
-        # positions de départ
+
+        # Positions de départ
+
         self.POS_X_GAUCHE = ORG_BAT_X + LRG_BAT_1 + MARGE_ASC + (ascenseur.num_asc * LRG_BAT_ASC)
         self.POS_X_DROITE = self.POS_X_GAUCHE + LRG_BAT_ASC - (2 * MARGE_ASC)
         self.pos_y = self._conv_pos_depuis_etage(etage)
@@ -133,10 +141,7 @@ class AscenseurGui:
         Ouverture progressive de la porte dans le délai en seconde(s) par
         pas de 6 étapes.
         """
-        # if self.OUVRIR_PORTE:
-            # self.logger.debug("Ascenseur <%d>: ouverture de la porte..." % self.ascenseur.idx_asc)
-        # else:
-            # self.logger.debug("Ascenseur <%d>: fermeture de la porte..." % self.ascenseur.idx_asc)
+
         for i in range(6):
             if action == self.OUVRIR_PORTE:
                 self.largeur_battant -= self.OUV_INCREMENT
@@ -145,18 +150,19 @@ class AscenseurGui:
             else:
                 pass
             sleep(float(delai / 6))
-            # si arrêt de la simulation
+
+            # Si arrêt de la simulation
+
             if self.flg_simu_stop:
                 break
         fn_retour(self.ascenseur)
-        # self.logger.debug("Ascenseur <%d>: action de la porte OK." % self.ascenseur.idx_asc)
+
 
     def deplacement(self, delai_etage, nb_etages, sens, fn_situation):
         """
         Déplacement avec un délai sous-traité.
-        Les batiments avec moins de 15 étages ont des ascenseurs mettant 3s / étage;
-        entre 15 et 30 étages c'est 1s / étage, et les grandes tours peuvent avoir
-        des asccenseurs mettant 0.5s / étage.
+        Le batiments  a un ascenseur mettant 3s / étage
+
         @type  delai_etage: nombre entier
         @param delai_etage: temps de transition entre deux étage en seconde(s)
         @type  nb_etages: nombre entier
@@ -176,12 +182,12 @@ class AscenseurGui:
         """
         NB_ETAPES = 10
         for etage in range(nb_etages):
-            # si demandé, arrêt
+            # Si demandé, arrêt
             if self.flg_simu_stop:
                 break
-            # incrémentation en 6 étapes pour aller vers l'étage adjacent
+            # Incrémentation en 6 étapes pour aller vers l'étage adjacent
             for inc in range(NB_ETAPES):
-                # si demandé, arrêt
+                # Si demandé, arrêt
                 if self.flg_simu_stop:
                     break
                 sleep(float(delai_etage / NB_ETAPES))
@@ -189,34 +195,41 @@ class AscenseurGui:
                     self.pos_y -= HAUTEUR_ETAGE / NB_ETAPES
                 else:
                     self.pos_y += HAUTEUR_ETAGE / NB_ETAPES
-            # on s'est déplacé d'un étage, information partagée
+
+            # On s'est déplacé d'un étage, information partagée
+
             fn_situation(sens)
-        # on est arrivé à destination, information partagée
+
+        # On est arrivé à destination, information partagée
+
         fn_situation(SENS.AUCUN)
 
     def on_draw(self, area, context):
         """
         Dessin de l'ascenseur.
-        @type  area: DrawingArea
-        @param area: Composant lié à l'événement
-        @type  context: cairo context
-        @param context: Surface de dessin
+
         """
         hauteur_asc = -(HAUTEUR_ETAGE - (2 * MARGE_ASC))
         largeur_asc = LRG_BAT_ASC - (2 * MARGE_ASC)
-        # contour
+
+        # Contour
+
         context.rectangle(self.POS_X_GAUCHE,
                           self.pos_y,
                           largeur_asc,
                           hauteur_asc)
         context.stroke()
-        # battant gauche de la porte
+
+        # Battant gauche de la porte
+
         context.rectangle(self.POS_X_GAUCHE,
                           self.pos_y,
                           self.largeur_battant,
                           hauteur_asc)
         context.stroke()
-        # battant droit de la porte
+
+        # Battant droit de la porte
+
         context.rectangle(self.POS_X_DROITE,
                           self.pos_y,
                           -self.largeur_battant,
@@ -315,19 +328,23 @@ class BoutonInterneSimpleGui(BoutonGui):
 
 
 
-
 class BoutonExterneHautGui(BoutonGui):
     """
     Représentation du bouton d'appel en montant.
     """
 
-    # point à gauche
+    # Point à gauche
+
     pt1_x = None
     pt1_y = None
-    # point à droite
+
+    # Point à droite
+
     pt2_x = None
     pt2_y = None
-    # point en haut
+
+    # Point en haut
+
     pt3_x = None
     pt3_y = None
 
@@ -339,7 +356,9 @@ class BoutonExterneHautGui(BoutonGui):
         self.bouton = bouton
         pas_v = HAUTEUR_ETAGE / 4
         pas_h = LRG_BAT_ASC / 4
-        # coordonnées du point à gauche en bas de la case
+
+        # Coordonnées du point à gauche en bas de la case
+
         pos_x = ORG_BAT_X + LRG_BAT_1
         pos_y = HAUTEUR_SOL - (self.bouton.appel.etage * HAUTEUR_ETAGE)
         self.pt1_x = float(pos_x + pas_h)
@@ -373,25 +392,29 @@ class BoutonExterneBasGui(BoutonGui):
     Représentation graphique du bouton d'appel en descente.
     """
 
-    # point à gauche
+    # Point à gauche
+
     pt1_x = None
     pt1_y = None
-    # point à droite
+
+    # Point à droite
+
     pt2_x = None
     pt2_y = None
-    # point en haut
+
+    # Point en haut
+
     pt3_x = None
     pt3_y = None
 
     def __init__(self, bouton):
-        """ Constructeur
-        @type  bouton: objet Bouton
-        @param bouton: bouton d'appel
-        """
+
         self.bouton = bouton
         pas_v = HAUTEUR_ETAGE / 4
         pas_h = LRG_BAT_ASC / 4
-        # coordonnées du point à gauche en bas de la case
+
+        # Coordonnées du point à gauche en bas de la case
+
         pos_x = ORG_BAT_X + LRG_BAT_1
         pos_y = HAUTEUR_SOL - (self.bouton.appel.etage * HAUTEUR_ETAGE)
         self.pt1_x = float(pos_x + pas_h)
@@ -405,10 +428,7 @@ class BoutonExterneBasGui(BoutonGui):
     def on_draw(self, area, context):
         """
         Dessin du bouton
-        @type  area: DrawingArea
-        @param area: Composant lié à l'événement
-        @type  context: cairo context
-        @param context: Surface de dessin
+
         """
         context.move_to(self.pt1_x, self.pt1_y)
         context.line_to(self.pt2_x, self.pt2_y)
